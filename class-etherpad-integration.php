@@ -1,11 +1,47 @@
 <?php
 
 class EtherpadIntegration {
-  public $ETHERPAD_API_KEY = '5359cfd882946d4d812be5559c40f8ec70604b620f71150b533a62f0fd2a8988';
-  public $ETHERPAD_URL = 'http://ec2-34-239-49-163.compute-1.amazonaws.com/';
+  // public $ETHERPAD_API_KEY = '5359cfd882946d4d812be5559c40f8ec70604b620f71150b533a62f0fd2a8988';
+  // public $ETHERPAD_URL = 'http://ec2-34-239-49-163.compute-1.amazonaws.com/';
+  public $ETHERPAD_API_KEY = '6aa157aa6a64e5222b32a945f717a3c102fc7a741503093f41a9077f376093f0';
+  public $ETHERPAD_URL = 'https://ipecase.org:8282';
 
   public function init () {
     add_action('wp_insert_post', array($this,'perform_etherpad_integration'));
+    add_action('the_content', array($this, 'filter_etherpad_content'));
+  }
+
+
+  public function filter_etherpad_content ($content) {
+    if (is_singular('etherpad')) {
+      $user_id = get_current_user_id();
+      $etherpad_author_id = get_user_meta($user_id, 'etherpad_author_id', true);
+      $etherpad_group_id = get_user_meta($user_id, 'etherpad_group_id', true);
+      $valid_until = time() + (60 * 60 * 3);
+
+      $session_id = $this->create_etherpad_session($etherpad_group_id, $etherpad_author_id, $valid_until);
+
+      $etherpad_id = get_post_meta(get_the_ID(), $etherpad_group_id, true);
+      var_dump(get_the_ID());
+
+      $js_cookie = sprintf('<script type="text/javascript">document.cookie="sessionID=%s;path=/"</script>', $session_id);
+      $iframe = sprintf("<iframe src='https://ipecase.org:8282/p/%s' width=600 height=400></iframe>", $etherpad_id );
+
+      $content = $js_cookie . $iframe;
+      return $content;
+    } else {
+      return $content;
+    }
+  }
+
+  public function create_etherpad_session ($group_id, $author_id, $valid_until) {
+    $base_url = $this->ETHERPAD_URL . '/api/1/createSession?apikey=%s&groupID=%s&authorID=%s&validUntil=%d';
+    $formatted_url = sprintf($base_url, $this->ETHERPAD_API_KEY, $group_id, $author_id, $valid_until);
+    $response = wp_remote_get($formatted_url);
+    $body = json_decode($response['body'], true);
+    if ($body['message'] == 'ok'){
+      return $body['data']['sessionID'];
+    }
   }
 
   public function create_group_pad ($group_id, $post_title, $post_content) {
@@ -18,10 +54,9 @@ class EtherpadIntegration {
     }
   }
 
-  public function update_etherpad_user_meta ($author_id, $etherpad_author_id, $etherpad_group_id, $etherpad_pad_id) {
+  public function update_etherpad_user_meta ($author_id, $etherpad_author_id, $etherpad_group_id) {
     update_user_meta($author_id, 'etherpad_author_id', $etherpad_author_id);
     update_user_meta($author_id, 'etherpad_group_id', $etherpad_group_id);
-    update_user_meta($author_id, 'etherpad_pad_id', $etherpad_pad_id);
   }
 
   public function get_learndash_groups_users () {
@@ -61,9 +96,10 @@ class EtherpadIntegration {
     $groups_users = $this->get_learndash_groups_users();
     $groups = [];
     foreach($groups_users as $data) {
-      $user_etherpad_id = $this->create_user_if_not_exists($data['user_id'], $data['display_name']);
+      $user_etherpad_id = $this->create_user_if_not_exists($data['display_name'], $data['user_id']);
       $group_etherpad_id = $this->create_group_if_not_exists($data['meta_value']);
       array_push($groups, $group_etherpad_id);
+      $this->update_etherpad_user_meta($data['user_id'], $user_etherpad_id, $group_etherpad_id);
     }
 
     $unique_groups = array_unique($groups);
@@ -81,9 +117,21 @@ class EtherpadIntegration {
         $post_title = get_the_title($post_id);
         $post_content = get_the_content($post_id);
 
-        $group_etherpad_ids = create_groups_and_users_in_etherpad();
-        // foreach $group_etherpad_id run create group pad
-        // store in array group id, pad id, set as post meta
+         $group_etherpad_ids = $this->create_groups_and_users_in_etherpad();
+         $etherpads = [];
+         foreach($group_etherpad_ids as $group_id) {
+           $etherpad_id = $this->create_group_pad($group_id, $post_title, $post_content);
+           $post_meta = [
+             'group_id' => $group_id,
+             'pad_id' => $etherpad_id
+           ];
+           array_push($etherpads, $post_meta);
+         }
+
+         foreach($etherpads as $etherpad) {
+           update_post_meta($post_id, $etherpad['group_id'], $etherpad['pad_id']);
+         }
+
       }
     } catch (Exception $exc) {
       var_dump($exc);
