@@ -18,7 +18,3 @@ require_once dirname(__FILE__) . '/class-etherpad-integration.php';
 
 $etherpad_integration = new EtherpadIntegration();
 $etherpad_integration->init();
-
-
-
-
