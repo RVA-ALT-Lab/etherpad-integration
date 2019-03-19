@@ -13,7 +13,7 @@
  */
 
 // Your code starts here.
-
+require_once dirname(__FILE__) . '/post-types/etherpad.php';
 require_once dirname(__FILE__) . '/class-etherpad-integration.php';
 
 $etherpad_integration = new EtherpadIntegration();
