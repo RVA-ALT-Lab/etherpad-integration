@@ -80,6 +80,7 @@ class EtherpadIntegration {
     $base_url = $this->ETHERPAD_URL . '/api/1/createAuthorIfNotExistsFor?apikey=%s&name=%s&authorMapper=%d';
     $formatted_url = sprintf($base_url, $this->ETHERPAD_API_KEY, $nickname, $id );
     $response = wp_remote_get($formatted_url);
+    echo $response;
     $body = json_decode($response['body'], true);
     return $body['data']['authorID'];
   }
@@ -134,7 +135,7 @@ class EtherpadIntegration {
 
       }
     } catch (Exception $exc) {
-      var_dump($exc);
+      echo($exc);
     }
   }
 
