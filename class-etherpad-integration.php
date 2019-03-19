@@ -74,15 +74,19 @@ class EtherpadIntegration {
 
 
   public function perform_etherpad_integration ($post_id) {
-    $post = get_post($post_id);
+    try {
+      $post = get_post($post_id);
 
-    if ($post->post_status == 'publish' && $post->post_type == 'etherpad') {
-      $post_title = get_the_title($post_id);
-      $post_content = get_the_content($post_id);
+      if ($post->post_status == 'publish' && $post->post_type == 'etherpad') {
+        $post_title = get_the_title($post_id);
+        $post_content = get_the_content($post_id);
 
-      $group_etherpad_ids = create_groups_and_users_in_etherpad();
-      // foreach $group_etherpad_id run create group pad
-      // store in array group id, pad id, set as post meta
+        $group_etherpad_ids = create_groups_and_users_in_etherpad();
+        // foreach $group_etherpad_id run create group pad
+        // store in array group id, pad id, set as post meta
+      }
+    } catch (Exception $exc) {
+      var_dump($exc);
     }
   }
 
