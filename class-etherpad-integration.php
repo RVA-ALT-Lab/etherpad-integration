@@ -4,7 +4,7 @@ class EtherpadIntegration {
   // public $ETHERPAD_API_KEY = '5359cfd882946d4d812be5559c40f8ec70604b620f71150b533a62f0fd2a8988';
   // public $ETHERPAD_URL = 'http://ec2-34-239-49-163.compute-1.amazonaws.com/';
   public $ETHERPAD_API_KEY = '6aa157aa6a64e5222b32a945f717a3c102fc7a741503093f41a9077f376093f0';
-  public $ETHERPAD_URL = 'https://ipecase.org:8282';
+  public $ETHERPAD_URL = 'http://ipecase.org:8282';
 
   public function init () {
     add_action('wp_insert_post', array($this,'perform_etherpad_integration'));
@@ -80,7 +80,7 @@ class EtherpadIntegration {
     $base_url = $this->ETHERPAD_URL . '/api/1/createAuthorIfNotExistsFor?apikey=%s&name=%s&authorMapper=%d';
     $formatted_url = sprintf($base_url, $this->ETHERPAD_API_KEY, $nickname, $id );
     $response = wp_remote_get($formatted_url);
-    echo $response;
+    var_dump($response);
     $body = json_decode($response['body'], true);
     return $body['data']['authorID'];
   }
