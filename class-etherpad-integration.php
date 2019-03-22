@@ -20,9 +20,7 @@ class EtherpadIntegration {
       $valid_until = time() + (60 * 60 * 3);
 
       $session_id = $this->create_etherpad_session($etherpad_group_id, $etherpad_author_id, $valid_until);
-
       $etherpad_id = get_post_meta(get_the_ID(), $etherpad_group_id, true);
-      var_dump(get_the_ID());
 
       $js_cookie = sprintf('<script type="text/javascript">document.cookie="sessionID=%s;path=/"</script>', $session_id);
       $iframe = sprintf("<iframe src='https://ipecase.org:8282/p/%s' width=600 height=400></iframe>", $etherpad_id );
@@ -80,7 +78,6 @@ class EtherpadIntegration {
     $base_url = $this->ETHERPAD_URL . '/api/1/createAuthorIfNotExistsFor?apikey=%s&name=%s&authorMapper=%d';
     $formatted_url = sprintf($base_url, $this->ETHERPAD_API_KEY, $nickname, $id );
     $response = wp_remote_get($formatted_url);
-    var_dump($response);
     $body = json_decode($response['body'], true);
     return $body['data']['authorID'];
   }
