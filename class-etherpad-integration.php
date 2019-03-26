@@ -21,13 +21,16 @@ class EtherpadIntegration {
 
       $session_id = $this->create_etherpad_session($etherpad_group_id, $etherpad_author_id, $valid_until);
       $etherpad_id = get_post_meta(get_the_ID(), $etherpad_group_id, true);
-      var_dump($session_id);
-      var_dump($etherpad_id);
+
+      if ($session_id !== null) {
       $js_cookie = sprintf('<script type="text/javascript">document.cookie="sessionID=%s;path=/"</script>', $session_id);
       $iframe = sprintf("<iframe src='http://ipecase.org:8282/p/%s' width=600 height=400></iframe>", $etherpad_id );
 
       $content = $js_cookie . $iframe;
       return $content;
+      } else {
+      return 'You are not a part of a learn dash group';
+      }
     } else {
       return $content;
     }
@@ -41,6 +44,8 @@ class EtherpadIntegration {
     if ($body['message'] == 'ok'){
       return $body['data']['sessionID'];
     }
+    else {
+    }
   }
 
   public function create_group_pad ($group_id, $post_title, $post_content) {
@@ -50,6 +55,8 @@ class EtherpadIntegration {
     $body = json_decode($response['body'], true);
     if ($body['message'] == 'ok'){
       return $body['data']['padID'];
+    } else {
+      var_dump($body);
     }
   }
 
