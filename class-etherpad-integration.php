@@ -9,6 +9,26 @@ class EtherpadIntegration {
   public function init () {
     add_action('wp_insert_post', array($this,'perform_etherpad_integration'));
     add_action('the_content', array($this, 'filter_etherpad_content'));
+    add_shortcode('etherpad', array($this, 'render_etherpad_shortcode'));
+  }
+
+  public function render_etherpad_shortcode ($atts) {
+      $user_id = get_current_user_id();
+      $etherpad_author_id = get_user_meta($user_id, 'etherpad_author_id', true);
+      $etherpad_group_id = get_user_meta($user_id, 'etherpad_group_id', true);
+      $valid_until = time() + (60 * 60 * 3);
+
+      $session_id = $this->create_etherpad_session($etherpad_group_id, $etherpad_author_id, $valid_until);
+      $etherpad_id = get_post_meta($atts['id'], $etherpad_group_id, true);
+
+      if ($session_id !== null) {
+        $js_cookie = sprintf('<script type="text/javascript">document.cookie="sessionID=%s;path=/"</script>', $session_id);
+        $iframe = sprintf("<iframe src='http://ipecase.org:8282/p/%s' width=600 height=400></iframe>", $etherpad_id );
+        $content = $js_cookie . $iframe;
+        return $content;
+      } else {
+        return 'You are not a part of a learn dash group';
+      }
   }
 
 
