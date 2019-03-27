@@ -44,7 +44,7 @@ class EtherpadIntegration {
 
   public function render_etherpad_shortcode ($atts) {
       $post_id = $atts['id'];
-      $etherpad_script = generate_etherpad_script($post_id);
+      $etherpad_script = $this->generate_etherpad_script($post_id);
       return $etherpad_script;
   }
 
@@ -52,7 +52,7 @@ class EtherpadIntegration {
   public function filter_etherpad_content ($content) {
     if (is_singular('etherpad')) {
       $post_id = get_the_ID();
-      $etherpad_script = generate_etherpad_script($post_id);
+      $etherpad_script = $this->generate_etherpad_script($post_id);
       return $etherpad_script;
     } else {
       return $content;
