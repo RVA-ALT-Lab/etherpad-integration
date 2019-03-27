@@ -58,8 +58,8 @@ class EtherpadIntegration {
       if ($session_id !== null) {
         $script = '
         <div id="etherpad-iframe-container"></div>
-        <script type="text/javascript>
-          document.cookie="sessionID=%s;path=/;";
+        <script type="text/javascript">
+          document.cookie = "sessionID=%s;path=/;";
           var iframeContainer = document.querySelector("#etherpad-iframe-container");
           var iframe = document.createElement("iframe");
           iframe.src = "https://www.ipecase.org:8282/p/%s";
