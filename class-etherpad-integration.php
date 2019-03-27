@@ -12,70 +12,48 @@ class EtherpadIntegration {
     add_shortcode('etherpad', array($this, 'render_etherpad_shortcode'));
   }
 
+  public function generate_etherpad_script ($id) {
+    $user_id = get_current_user_id();
+    $etherpad_author_id = get_user_meta($user_id, 'etherpad_author_id', true);
+    $etherpad_group_id = get_user_meta($user_id, 'etherpad_group_id', true);
+    $valid_until = time() + (60 * 60 * 3);
+
+    $session_id = $this->create_etherpad_session($etherpad_group_id, $etherpad_author_id, $valid_until);
+    $etherpad_id = get_post_meta($id, $etherpad_group_id, true);
+
+    if ($session_id !== null) {
+      $script = '
+      <div id="etherpad-iframe-container"></div>
+      <script type="text/javascript">
+        document.cookie = "sessionID=%s;path=/;";
+        var iframeContainer = document.querySelector("#etherpad-iframe-container");
+        var iframe = document.createElement("iframe");
+        iframe.src = "https://ipecase.org:8282/p/%s";
+        iframe.width = 400;
+        iframe.height = 600;
+        iframeContainer.appendChild(iframe);
+      </script>
+      ';
+      $formatted_script = sprintf($script, $session_id, $etherpad_id);
+      $content = $formatted_script;
+      return $content;
+    } else {
+      return 'You are not a part of a learn dash group';
+    }
+  }
+
   public function render_etherpad_shortcode ($atts) {
-      $user_id = get_current_user_id();
-      $etherpad_author_id = get_user_meta($user_id, 'etherpad_author_id', true);
-      $etherpad_group_id = get_user_meta($user_id, 'etherpad_group_id', true);
-      $valid_until = time() + (60 * 60 * 3);
-
-      $session_id = $this->create_etherpad_session($etherpad_group_id, $etherpad_author_id, $valid_until);
-      $etherpad_id = get_post_meta($atts['id'], $etherpad_group_id, true);
-
-      if ($session_id !== null) {
-
-        $script = '
-        <div id="etherpad-iframe-container"></div>
-        <script type="text/javascript>
-          document.cookie="sessionID=%s;path=/;";
-          var iframeContainer = document.querySelector("#etherpad-iframe-container");
-          var iframe = document.createElement("iframe");
-          iframe.src = %s;
-          iframe.width = 400;
-          iframe.height = 600;
-          iframeContainer.appendChild(iframe);
-        </script>
-        ';
-        // $js_cookie = sprintf('<script type="text/javascript">document.cookie="sessionID=%s;path=/"</script>', $session_id);
-        // $iframe = sprintf("<iframe src='https://www.ipecase.org:8282/p/%s' width=600 height=400></iframe>", $etherpad_id );
-        $content = $script;
-        return $content;
-      } else {
-        return 'You are not a part of a learn dash group';
-      }
+      $post_id = $atts['id'];
+      $etherpad_script = generate_etherpad_script($post_id);
+      return $etherpad_script;
   }
 
 
   public function filter_etherpad_content ($content) {
     if (is_singular('etherpad')) {
-      $user_id = get_current_user_id();
-      $etherpad_author_id = get_user_meta($user_id, 'etherpad_author_id', true);
-      $etherpad_group_id = get_user_meta($user_id, 'etherpad_group_id', true);
-      $valid_until = time() + (60 * 60 * 3);
-
-      $session_id = $this->create_etherpad_session($etherpad_group_id, $etherpad_author_id, $valid_until);
-      $etherpad_id = get_post_meta(get_the_ID(), $etherpad_group_id, true);
-
-      if ($session_id !== null) {
-        $script = '
-        <div id="etherpad-iframe-container"></div>
-        <script type="text/javascript">
-          document.cookie = "sessionID=%s;path=/;";
-          var iframeContainer = document.querySelector("#etherpad-iframe-container");
-          var iframe = document.createElement("iframe");
-          iframe.src = "https://ipecase.org:8282/p/%s";
-          iframe.width = 400;
-          iframe.height = 600;
-          iframeContainer.appendChild(iframe);
-        </script>
-        ';
-        $formatted_script = sprintf($script, $session_id, $etherpad_id);
-        // $js_cookie = sprintf('<script type="text/javascript">document.cookie="sessionID=%s;path=/"</script>', $session_id);
-        // $iframe = sprintf("<iframe src='https://www.ipecase.org:8282/p/%s' width=600 height=400></iframe>", $etherpad_id );
-        $content = $formatted_script;
-        return $content;
-      } else {
-      return 'You are not a part of a learn dash group';
-      }
+      $post_id = get_the_ID();
+      $etherpad_script = generate_etherpad_script($post_id);
+      return $etherpad_script;
     } else {
       return $content;
     }
