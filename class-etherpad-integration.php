@@ -72,6 +72,7 @@ class EtherpadIntegration {
         // $js_cookie = sprintf('<script type="text/javascript">document.cookie="sessionID=%s;path=/"</script>', $session_id);
         // $iframe = sprintf("<iframe src='https://www.ipecase.org:8282/p/%s' width=600 height=400></iframe>", $etherpad_id );
         $content = $formatted_script;
+        return $content;
       } else {
       return 'You are not a part of a learn dash group';
       }
