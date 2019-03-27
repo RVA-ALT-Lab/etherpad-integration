@@ -44,7 +44,7 @@ class EtherpadIntegration {
 
       if ($session_id !== null) {
       $js_cookie = sprintf('<script type="text/javascript">document.cookie="sessionID=%s;path=/"</script>', $session_id);
-      $iframe = sprintf("<iframe src='http://ipecase.org:8282/p/%s' width=600 height=400></iframe>", $etherpad_id );
+      $iframe = sprintf("<iframe src='https://ipecase.org:8282/p/%s' width=600 height=400></iframe>", $etherpad_id );
 
       $content = $js_cookie . $iframe;
       return $content;
