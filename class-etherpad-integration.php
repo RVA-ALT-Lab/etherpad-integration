@@ -166,7 +166,8 @@ class EtherpadIntegration {
 
       if ($post->post_status == 'publish' && $post->post_type == 'etherpad') {
         $post_title = get_the_title($post_id);
-        $post_content = get_the_content($post_id);
+
+        $post_content = $post->post_content;
 
          $group_etherpad_ids = $this->create_groups_and_users_in_etherpad();
          $etherpads = [];
