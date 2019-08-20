@@ -15,8 +15,10 @@ class EtherpadIntegration {
   public function generate_etherpad_script ($id) {
     if (isset($_GET['group']) && $_GET['group'] > 0 ) {
       $etherpad_group_id = $_GET['group'];
+      echo $etherpad_group_id;
     } else {
       $etherpad_group_id = get_user_meta($user_id, 'etherpad_group_id', true);
+      echo $etherpad_group_id;
     }
     $user_id = get_current_user_id();
     $etherpad_author_id = get_user_meta($user_id, 'etherpad_author_id', true);
