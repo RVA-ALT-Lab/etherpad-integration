@@ -13,9 +13,13 @@ class EtherpadIntegration {
   }
 
   public function generate_etherpad_script ($id) {
+    if (isset($_GET['group']) && $_GET['group'] > 0 ) {
+      $etherpad_group_id = $_GET['group'];
+    } else {
+      $etherpad_group_id = get_user_meta($user_id, 'etherpad_group_id', true);
+    }
     $user_id = get_current_user_id();
     $etherpad_author_id = get_user_meta($user_id, 'etherpad_author_id', true);
-    $etherpad_group_id = get_user_meta($user_id, 'etherpad_group_id', true);
     $valid_until = time() + (60 * 60 * 3);
 
     $session_id = $this->create_etherpad_session($etherpad_group_id, $etherpad_author_id, $valid_until);
@@ -98,6 +102,10 @@ class EtherpadIntegration {
     global $wpdb;
     $user_id = get_current_user_id();
     $results = $wpdb->get_results($wpdb->prepare('SELECT meta_value FROM wp_usermeta WHERE user_id = %d', $user_id), 'ARRAY_A');
+    //Todo:
+    // Tom will pass group_id in query string
+    // to automatically populate the correct Etherpad when coming from proctor view
+
     return $results[0];
   }
   /*
