@@ -17,6 +17,7 @@ class EtherpadIntegration {
     if (isset($_GET['group'])) {
       echo 'Inside of if block';
       $etherpad_group_id = $_GET['group'];
+      echo $etherpad_group_id;
     } else {
       echo 'Inside of else block';
       $etherpad_group_id = get_user_meta($user_id, 'etherpad_group_id', true);
@@ -26,6 +27,7 @@ class EtherpadIntegration {
 
     $session_id = $this->create_etherpad_session($etherpad_group_id, $etherpad_author_id, $valid_until);
     $etherpad_id = get_post_meta($id, $etherpad_group_id, true);
+    echo $etherpad_id;
 
     if ($session_id !== null) {
       $script = '
