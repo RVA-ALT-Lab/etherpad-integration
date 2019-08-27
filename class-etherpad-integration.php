@@ -24,7 +24,6 @@ class EtherpadIntegration {
 
     $session_id = $this->create_etherpad_session($etherpad_group_id, $etherpad_author_id, $valid_until);
     $etherpad_id = get_post_meta($id, $etherpad_group_id, true);
-    echo $etherpad_id;
 
     if ($session_id !== null) {
       $script = '
@@ -34,7 +33,7 @@ class EtherpadIntegration {
         var iframeContainer = document.querySelector("#etherpad-iframe-container");
         var iframe = document.createElement("iframe");
         iframe.src = "https://ipecase.org:8282/p/%s";
-        iframe.width = 400;
+        iframe.width = "100%";
         iframe.height = 600;
         iframeContainer.appendChild(iframe);
       </script>
