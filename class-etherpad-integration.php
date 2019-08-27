@@ -26,14 +26,13 @@ class EtherpadIntegration {
     $etherpad_id = get_post_meta($id, $etherpad_group_id, true);
 
     if ($session_id !== null) {
-      $script = '
-      <div id="etherpad-iframe-container"></div>
-      <style>
+      $styles = '<style>
           .etherpad-iframe {
               height: 600px;
               width: 100%;
-            }
-      </style>
+            }</style>';
+      $script = '
+      <div id="etherpad-iframe-container"></div>
       <script type="text/javascript">
         document.cookie = "sessionID=%s;path=/;";
         var iframeContainer = document.querySelector("#etherpad-iframe-container");
@@ -44,7 +43,7 @@ class EtherpadIntegration {
       </script>
       ';
       $formatted_script = sprintf($script, $session_id, $etherpad_id);
-      $content = $formatted_script;
+      $content = $styles . $formatted_script;
       return $content;
     } else {
       return 'You are not a part of a learn dash group';
