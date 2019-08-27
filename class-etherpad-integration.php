@@ -34,7 +34,7 @@ class EtherpadIntegration {
         var iframeContainer = document.querySelector("#etherpad-iframe-container");
         var iframe = document.createElement("iframe");
         iframe.src = "https://ipecase.org:8282/p/%s";
-        iframe.width = 400;
+        iframe.width = "100%";
         iframe.height = 600;
         iframeContainer.appendChild(iframe);
       </script>
