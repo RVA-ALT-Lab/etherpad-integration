@@ -28,13 +28,18 @@ class EtherpadIntegration {
     if ($session_id !== null) {
       $script = '
       <div id="etherpad-iframe-container"></div>
+      <style>
+          .etherpad-iframe {
+              height: 600px;
+              width: 100%;
+            }
+      </style>
       <script type="text/javascript">
         document.cookie = "sessionID=%s;path=/;";
         var iframeContainer = document.querySelector("#etherpad-iframe-container");
         var iframe = document.createElement("iframe");
+        iframe.classList.add("etherpad-iframe");
         iframe.src = "https://ipecase.org:8282/p/%s";
-        iframe.width = "100%";
-        iframe.height = 600;
         iframeContainer.appendChild(iframe);
       </script>
       ';
