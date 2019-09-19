@@ -20,7 +20,7 @@ class EtherpadIntegration {
       $etherpad_group_id = get_user_meta($user_id, 'etherpad_group_id', true);
     }
     $etherpad_author_id = get_user_meta($user_id, 'etherpad_author_id', true);
-    $valid_until = time() + (60 * 60 * 3);
+    $valid_until = time() + (60 * 60);
 
     $session_id = $this->create_etherpad_session($etherpad_group_id, $etherpad_author_id, $valid_until);
     $etherpad_id = get_post_meta($id, $etherpad_group_id, true);
@@ -30,7 +30,8 @@ class EtherpadIntegration {
           .etherpad-iframe {
               height: 600px;
               width: 100%;
-            }</style>';
+            }</style>
+            <h2>Group Id: '. $etherpad_group_id .'</h2>'  ;
       $script = '
       <div id="etherpad-iframe-container"></div>
       <script type="text/javascript">
@@ -87,7 +88,31 @@ class EtherpadIntegration {
     if ($body['message'] == 'ok'){
       return $body['data']['padID'];
     } else {
-      var_dump($body);
+      var_dump('Error creating pad: '. $body. ' ' . $formatted_url . '\n\n');
+    }
+  }
+
+  public function delete_pad ($pad_id) {
+    $base_url = $this->ETHERPAD_URL . '/api/1/deletePad?apikey=%s&padID=%s&';
+    $formatted_url = sprintf($base_url, $this->ETHERPAD_API_KEY, $pad_id);
+    $response = wp_remote_get($formatted_url);
+    $body = json_decode($response['body'], true);
+    if ($body['message'] == 'ok'){
+      return 'successfully deleted pad: '. $pad_id;
+    } else {
+      var_dump('Error deleting pad: '. $body. ' ' . $formatted_url . '\n\n');
+    }
+  }
+
+  public function list_all_pads () {
+    $base_url = $this->ETHERPAD_URL . '/api/1/deletePad?apikey=%s&padID=%s&';
+    $formatted_url = sprintf($base_url, $this->ETHERPAD_API_KEY, $pad_id);
+    $response = wp_remote_get($formatted_url);
+    $body = json_decode($response['body'], true);
+    if ($body['message'] == 'ok'){
+      return 'successfully deleted pad: '. $pad_id;
+    } else {
+      var_dump('Error deleting pad: '. $body. ' ' . $formatted_url . '\n\n');
     }
   }
 
