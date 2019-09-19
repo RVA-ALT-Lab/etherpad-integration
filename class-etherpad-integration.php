@@ -30,8 +30,7 @@ class EtherpadIntegration {
           .etherpad-iframe {
               height: 600px;
               width: 100%;
-            }</style>
-            <h2>Group Id: '. $etherpad_group_id .'</h2>'  ;
+            }</style>';
       $script = '
       <div id="etherpad-iframe-container"></div>
       <script type="text/javascript">
